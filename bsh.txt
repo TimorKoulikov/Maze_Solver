@@ -1,0 +1,1 @@
+GCC MazeSolver.c Node.c -o myprog

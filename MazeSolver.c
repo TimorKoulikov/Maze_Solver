@@ -25,6 +25,9 @@ void CreateMaze();
 int** nearbyCells(int x, int y);
 
 int main() {
+
+	
+	
 	
 	Init();//Init the Board.everything saved in char** Board
 	
@@ -36,28 +39,33 @@ int main() {
 	
 }
 void Init() {
-	
+
 	srand(getpid());//Create uniqe rand(). without it the rand will generate the same random sequnce.
 
 	//Creating empty Board. setting values for each element in char**Board.
 	Board = (char**)malloc(sizeof(char*) * width);
-	for (int i = 0; i < height; i++) {
+
+	for (int i = 0; i < height; i++)
 		Board[i] = (char*)malloc(sizeof(char) * height);
-	}
+
 	//give walls to the board
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			//the border is #
-			if (i == 0 || j == 0 || i == width - 1 || j == height - 1) {
-				if((i ==START && j== 0)||(i==END && j==height-1)){ Board[i][j] = ' '; }//Draw the start end end of maze
-				else{ Board[i][j] = '#'; }
-				
-			}
-			else {
+			if (i == 0 || j == 0 || i == width - 1 || j == height - 1) 
+				//if((i ==START && j== 0)||(i==END && j==height-1)){ Board[i][j] = ' '; }//Draw the start end end of maze
+				Board[i][j] = '#';
+			
+			else 
+			{
 				Board[i][j] = ' ';
 			}
 		}
 	}
+
+	Board[START][0] = ' ';
+	Board[END][height - 1] = ' ';
+	
 	
 	
 	//Create the Maze

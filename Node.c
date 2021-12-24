@@ -1,84 +1,101 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "Node.h"
-//data must be lvalue
+
+/*Function create a single node and return it
+data must be lvalue*/
 Node* NodeCreate(void* data,DataType type) {
 	size_t effectivesize = 0;
-
-	if (type == INT) {
-		effectivesize = sizeof(int);
-		
-	}
-	else if (type == CHAR) {
-		effectivesize = sizeof(char);
-	}
-	else if (type == VECTOR) {
-		effectivesize = sizeof(int)*2;	
-	}
+	
+	switch (type)
+	{
+		case(INT):
+			effectivesize = sizeof(int);
+			break;
+		case(CHAR):
+			effectivesize = sizeof(char);
+			break;
+		case(VECTOR):
+			effectivesize = sizeof(int);
+			break;
+		default:
+			printf("NodeCreate() got wrong Type\n");
+			exit(0);
+	 }
+	
+	
 
 	Node* tmp = (Node*)malloc(sizeof(Node));
+
 	tmp->type = type;
 	tmp->size = effectivesize;
 	tmp->data = malloc(sizeof(effectivesize));
-
-	if (type == INT) {
-		int* x = data;
-		tmp->data =*x;
-
-	}
-	else if (type == CHAR) {
-		char* x = data;
-		tmp->data = *x;
-	}
-	else if (type==VECTOR) {
-		int* x = data;
-		tmp->data = x;
-	}
+	tmp->data =data;
 
 	tmp->Next = NULL;
+
 	return tmp;
 }
+/*Function push node to end to the list
+data must be lvalue*/
+Node* NodePush(Node* n, void* data) {
+		
+	
+	if (n->Next != NULL) 
+	{
+		return NodePush(n->Next, data);
+	}
 
-void NodePush(Node* n, void* data) {
-	Node* current = n;
-	if (current->Next != NULL) {
-		NodePush(current->Next, data);
-	}
-	else {
-		current->Next = NodeCreate(data, current->type);
-	}
+	n->Next = NodeCreate(data, n->type);
 }
+
+/*Function add node to the beginning of the list*/
 void NodeAddStart(Node** n, void* data) {
 	Node* newhead = NodeCreate(data, (*n)->type);
 	newhead->Next = *n;
 	*n =newhead;
 }
 
-
+/*Function prints list*/
 void NodePrintList(Node* n) {
 	if (n == NULL)
 		return 0;
-	if (n->type == INT) {
-		printf("%d\n",(int)n->data);
+
+	switch (n->type) 
+	{
+		case(INT):
+			printf("NodeData:%d\n",n->data);
+			break;
+		case(CHAR):
+			printf("NodeData:%c\n", n->data);
+			break;
+		case(VECTOR):
+			printf("[X:%d Y:%d]\n", ((int*)n->data)[0], ((int*)n->data)[1] );
+		default:
+			printf("NodePrintList() Nodepointer doesnt exists");
+			exit(0);
+
 	}
-	else if (n->type == CHAR) {
-		printf("%c\n", (char)n->data);
-	}
-	else if (n->type == VECTOR) {
-		printf("[X:%d ", ((int*)n->data)[0]);
-		printf("Y:%d]\n", ((int*)n->data)[1]);
-	}
+	
 	
 	NodePrintList(n->Next);
 
 }
-void NodeDelete(Node* head) {
+
+/*Function Delete spesific node from the list*/
+void NodeDelete(Node* head,Node* next) {
 	
-	if (head->Next != NULL) {
-		NodeDelete(head->Next);
+	if (head == next)
+	{
+		free(head);
+		return;
 	}
-	//free(head->data);
-	free(head);
+
+	if (head->Next != next) NodeDelete(head->Next, next);
+	else {
+		head->Next = next->Next;
+		free(next);
+	}
 	
 
 }

@@ -1,19 +1,25 @@
 #pragma once
 #include <stddef.h>
+
 typedef enum {
 	INT,
 	CHAR,
 	VECTOR
 
 }DataType;
+//DataType:enum for generic Node
+
 typedef struct Node {
 	DataType type;
 	size_t size;
-	int data;
+	void* data;
 	
 	struct Node* Next;
 }Node;
+//Node:
+
 void NodeAddStart(Node** n, void* data);
 Node* NodeCreate(void* data, DataType type);
-void NodePush(Node* n, void* data);
+Node* NodePush(Node* n, void* data);
 void NodePrintList(Node* n);
+void NodeDelete(Node*,Node*);

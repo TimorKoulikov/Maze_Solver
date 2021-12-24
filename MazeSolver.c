@@ -15,8 +15,12 @@ const int height = 20;
 char** Board;
 
 
-//Init the Board
+//Init() Init the board and the Maze
 void Init();
+//InitBoard() Init the board with walls,start,end
+void InitBoard();
+//InitMaze() Init Maze. the board must be Init first
+void InitMaze();
 //Draw the Board
 void Draw();
 void ChangeBoard(int x,int y,char c);
@@ -31,16 +35,26 @@ int main() {
 	
 	Init();//Init the Board.everything saved in char** Board
 	
-	Draw();//Draw the char** Board
+	
 	
 	Solve(NULL); //Solving the board;
-	Draw();
-	
+
 	
 }
-void Init() {
 
-	srand(getpid());//Create uniqe rand(). without it the rand will generate the same random sequnce.
+
+void Init() 
+{
+	InitBoard();
+	
+	InitMaze();
+}
+
+
+void InitBoard()
+{
+
+	
 
 	//Creating empty Board. setting values for each element in char**Board.
 	Board = (char**)malloc(sizeof(char*) * width);
@@ -52,11 +66,11 @@ void Init() {
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
 			//the border is #
-			if (i == 0 || j == 0 || i == width - 1 || j == height - 1) 
+			if (i == 0 || j == 0 || i == width - 1 || j == height - 1)
 				//if((i ==START && j== 0)||(i==END && j==height-1)){ Board[i][j] = ' '; }//Draw the start end end of maze
 				Board[i][j] = '#';
-			
-			else 
+
+			else
 			{
 				Board[i][j] = ' ';
 			}
@@ -65,32 +79,42 @@ void Init() {
 
 	Board[START][0] = ' ';
 	Board[END][height - 1] = ' ';
-	
-	
-	
+
+
+
+
+
+}
+
+
+void InitMaze()
+{
+
+	srand(getpid());//Create uniqe rand(). without it the rand will generate the same random sequnce.
+
 	//Create the Maze
 	int startpoint[2] = { START, 0 };
-	Node* start=NodeCreate(startpoint,VECTOR);
+	Node* start = NodeCreate(startpoint, VECTOR);
 
 	int** cells;
 	while (start != NULL) {//create Functions
 		int start_point[2];
-		start_point[0] =((int*)(start->data))[0] ;
+		start_point[0] = ((int*)(start->data))[0];
 		start_point[1] = ((int*)(start->data))[1];
-		
+
 		int** close_cells = nearbyCells(start_point[0], start_point[1]);
 		int num_close_cells = close_cells[0][0];
 		if (num_close_cells == 1) {
 			start = start->Next;
 			continue;
 		}
-		int r_cell = rand() % (num_close_cells-1);
+		int r_cell = rand() % (num_close_cells - 1);
 		//printf("\033[32;1m %d %d\033[0m\n",r_cell,num_close_cells-1);
-		int* next_cell= close_cells[r_cell+1];
+		int* next_cell = close_cells[r_cell + 1];
 		NodeAddStart(&start, next_cell);
 		//Board[next_cell[0]][next_cell[1]] = '0';
 		ChangeBoard(next_cell[0], next_cell[1], '0');
-		
+
 		if (abs(next_cell[0] - END) < 2 && abs(next_cell[1] - (width - 2)) < 2) {
 			if (abs(next_cell[0] - END) ^ abs(next_cell[1] - (width - 2))) {
 				int temp[2] = { END,width - 1 };
@@ -98,23 +122,24 @@ void Init() {
 				NodeAddStart(&start, next_cell);
 			}
 		}
-		
+
 	}
 	//create wall and path.Reverse the path into empty space and empty space into wall
-	for (int i = 1; i < width-1; i++) {
-		for (int j = 1; j < height-1; j++) {
+	for (int i = 1; i < width - 1; i++) {
+		for (int j = 1; j < height - 1; j++) {
 			if (Board[i][j] == ' ') {
 				Board[i][j] = '#';
 			}
 			if (Board[i][j] == '0') {
 				Board[i][j] = ' ';
 			}
-			
+
 		}
 	}
-	
-}
 
+
+
+}
 //check if next point can be part of the path.
 //RULES:1.cannot be a existing path(be '0')
 //		2.cannot be a wall(be '#')

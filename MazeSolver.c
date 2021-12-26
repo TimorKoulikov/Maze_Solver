@@ -23,23 +23,19 @@ void InitBoard();
 void InitMaze();
 //Draw the Board
 void Draw();
+//ChangeBoard() is changine the value in Board[x][y]=c
 void ChangeBoard(int x,int y,char c);
+//Solve the board in recurive way
 void Solve(Node* start);
+//creating the path of the maze
 void CreateMaze();
-int** nearbyCells(int x, int y);
+//find all nearby cells of a given cell in the maze
+int** nearbyCells(int*);
 
-int main() {
-
-	
-	
-	
-	Init();//Init the Board.everything saved in char** Board
-	
-	
-	
-	Solve(NULL); //Solving the board;
-
-	
+int main() 
+{
+	Init();//Init the Board.everything saved in char** Board	
+	Solve(NULL); //Solving the board;	
 }
 
 
@@ -50,30 +46,27 @@ void Init()
 	InitMaze();
 }
 
-
+//Init Board
+//the wall is made of '#' and empty space is ' '
 void InitBoard()
 {
-
 	
-
-	//Creating empty Board. setting values for each element in char**Board.
 	Board = (char**)malloc(sizeof(char*) * width);
 
 	for (int i = 0; i < height; i++)
 		Board[i] = (char*)malloc(sizeof(char) * height);
 
-	//give walls to the board
+	
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++) {
-			//the border is #
-			if (i == 0 || j == 0 || i == width - 1 || j == height - 1)
-				//if((i ==START && j== 0)||(i==END && j==height-1)){ Board[i][j] = ' '; }//Draw the start end end of maze
+			
+			if (i == 0 || j == 0 || i == width - 1 || j == height - 1) 
 				Board[i][j] = '#';
-
-			else
-			{
-				Board[i][j] = ' ';
+			else 
+			{ 
+				Board[i][j] = ' '; 
 			}
+			
 		}
 	}
 
@@ -89,7 +82,7 @@ void InitBoard()
 
 void InitMaze()
 {
-
+	
 	srand(getpid());//Create uniqe rand(). without it the rand will generate the same random sequnce.
 
 	//Create the Maze
@@ -98,23 +91,22 @@ void InitMaze()
 
 	int** cells;
 	while (start != NULL) {//create Functions
-		int start_point[2];
-		start_point[0] = ((int*)(start->data))[0];
-		start_point[1] = ((int*)(start->data))[1];
+		Draw();//DEBUG DLT
 
-		int** close_cells = nearbyCells(start_point[0], start_point[1]);
+		int** close_cells = nearbyCells(start->data);
 		int num_close_cells = close_cells[0][0];
 		if (num_close_cells == 1) {
 			start = start->Next;
 			continue;
 		}
 		int r_cell = rand() % (num_close_cells - 1);
-		//printf("\033[32;1m %d %d\033[0m\n",r_cell,num_close_cells-1);
+		
 		int* next_cell = close_cells[r_cell + 1];
 		NodeAddStart(&start, next_cell);
 		//Board[next_cell[0]][next_cell[1]] = '0';
 		ChangeBoard(next_cell[0], next_cell[1], '0');
 
+		//wtf is this????   
 		if (abs(next_cell[0] - END) < 2 && abs(next_cell[1] - (width - 2)) < 2) {
 			if (abs(next_cell[0] - END) ^ abs(next_cell[1] - (width - 2))) {
 				int temp[2] = { END,width - 1 };
@@ -122,8 +114,12 @@ void InitMaze()
 				NodeAddStart(&start, next_cell);
 			}
 		}
-
+		//free memory allocation
+		//while (num_close_cells) free(close_cells[--num_close_cells]);
+		//free(close_cells);
 	}
+
+
 	//create wall and path.Reverse the path into empty space and empty space into wall
 	for (int i = 1; i < width - 1; i++) {
 		for (int j = 1; j < height - 1; j++) {
@@ -159,32 +155,45 @@ int CanGo(int x,int y) {
 		
 }
 //return array of nearby cells
-int** nearbyCells(int x, int y) {
-	int** cells=(int**)calloc(1,sizeof(*cells));
+int** nearbyCells(int* cell) 
+{
 	
+	int addVec[4][2] = { {-1,0},{1,0},{0,1},{0,-1} };
+	int sumVec[4][2];
+	int count = 0;
+	int x = cell[0];
+	int y = cell[1];
 
-	int addVec[4][2] = { {-1,0},{1,0},{0,1},{0,-1}	};
-	int count = 1;
-	for (int i = 0; i < 4; i++) {
+	
+	
+	for (int i = 0; i < 4; i++)
+	{
 		int Sx = x + addVec[i][0];
 		int Sy = y + addVec[i][1];
-		if (CanGo(Sx, Sy)) {	
-			count++;			
-			cells = (int**)realloc(cells,count*(sizeof(*cells)));
 
-			cells[count - 1] =(int*) malloc(2*(sizeof(int)));
-			cells[count - 1][0] = Sx;
-			cells[count - 1][1] = Sy;
+		if (CanGo(Sx, Sy))
+		{
+			sumVec[count][0] =Sx;
+			sumVec[count][1] = Sy;
 			
-			
-			
-			
+			count++;
 		}
+		
+	}
+
+	int** cells=(int**)calloc(count+1,sizeof(*cells));
+	for (int i = 0; i < count; i++)
+	{
+		cells[i+1] = (int*)malloc(2 * sizeof(int));
+		cells[i+1][0] = sumVec[i][0];
+		cells[i+1][1] = sumVec[i][1];
 	}
 	cells[0] = (int*)malloc(2 * sizeof(int));
-	cells[0][0] = count;
-	return cells;
+	cells[0][0] = count+1;
 
+	return cells;
+	
+	
 }
 //Kinda explanatory.
 //If not. it is drawing the Board. :(
@@ -244,7 +253,7 @@ void Solve(Node * start) {
 			return 0;
 		}
 
-		int** close_cells = nearbyCells(start_point[0], start_point[1]);
+		int** close_cells = nearbyCells(start->data);
 		int num_close_cells = close_cells[0][0];
 		if (num_close_cells == 1) {
 			//Board[start_point[0]][start_point[1]] = '1';

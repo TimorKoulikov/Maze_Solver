@@ -268,6 +268,12 @@ void Solve(Node * start) {
 			//Board[start_point[0]][start_point[1]] = '1';
 			ChangeBoard(start_point[0], start_point[1], '1');
 			
+			//free memory allocation
+			for (int i = 0; i < num_close_cells; i++)
+			{
+				free(close_cells[i]);
+			}
+			free(close_cells);
 			return 0;
 		}
 		for (int i = 0; i < num_close_cells ; i++) {
@@ -284,6 +290,12 @@ void Solve(Node * start) {
 			if (Board[next_cell[0]][next_cell[1]] == '2') {
 				//Board[start_point[0]][start_point[1]] = '2';
 				ChangeBoard(start_point[0], start_point[1], '2');
+				//free memory allocation
+				for (int i = 0; i < num_close_cells; i++)
+				{
+					free(close_cells[i]);
+				}
+				free(close_cells);
 				return 0;
 			}
 

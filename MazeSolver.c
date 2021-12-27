@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include <stdio.h>
 #include "Node.h"
+#include "Vector.h"
 
 //TO_DO//
 //check about memory allocatin and returning array and pointer from function
@@ -34,8 +35,10 @@ int** nearbyCells(int*);
 
 int main() 
 {
+
 	Init();//Init the Board.everything saved in char** Board	
 	Solve(NULL); //Solving the board;	
+
 }
 
 
@@ -91,18 +94,22 @@ void InitMaze()
 
 	int** cells;
 	while (start != NULL) {//create Functions
-		Draw();//DEBUG DLT
+		
 
 		int** close_cells = nearbyCells(start->data);
 		int num_close_cells = close_cells[0][0];
-		if (num_close_cells == 1) {
+		if (num_close_cells == 0) {
 			start = start->Next;
 			continue;
 		}
-		int r_cell = rand() % (num_close_cells - 1);
+
+		int r_cell = rand() % (num_close_cells );
 		
 		int* next_cell = close_cells[r_cell + 1];
-		NodeAddStart(&start, next_cell);
+		int* tmp = (int*)malloc(sizeof(int));
+		tmp[0] = next_cell[0];
+		tmp[1] = next_cell[1];
+		NodeAddStart(&start, tmp);
 		//Board[next_cell[0]][next_cell[1]] = '0';
 		ChangeBoard(next_cell[0], next_cell[1], '0');
 
@@ -115,8 +122,11 @@ void InitMaze()
 			}
 		}
 		//free memory allocation
-		//while (num_close_cells) free(close_cells[--num_close_cells]);
-		//free(close_cells);
+		for (int i = 0; i < num_close_cells; i++)
+		{
+			free(close_cells[i]);
+		}
+		free(close_cells);
 	}
 
 
@@ -150,7 +160,6 @@ int CanGo(int x,int y) {
 	
 		return (Board[x][y] != '#' && Board[x][y] != '0' && count<=1);
 	}
-		else
 		return 0;
 		
 }
@@ -189,7 +198,7 @@ int** nearbyCells(int* cell)
 		cells[i+1][1] = sumVec[i][1];
 	}
 	cells[0] = (int*)malloc(2 * sizeof(int));
-	cells[0][0] = count+1;
+	cells[0][0] = count;
 
 	return cells;
 	
@@ -255,17 +264,19 @@ void Solve(Node * start) {
 
 		int** close_cells = nearbyCells(start->data);
 		int num_close_cells = close_cells[0][0];
-		if (num_close_cells == 1) {
+		if (num_close_cells == 0) {
 			//Board[start_point[0]][start_point[1]] = '1';
 			ChangeBoard(start_point[0], start_point[1], '1');
 			
 			return 0;
 		}
-		for (int i = 0; i < num_close_cells - 1; i++) {
+		for (int i = 0; i < num_close_cells ; i++) {
 
 			int* next_cell = close_cells[i + 1];
-
-			NodeAddStart(&start, next_cell);
+			int* tmp = (int*)malloc(sizeof(int));
+			tmp[0] = next_cell[0];
+			tmp[1] = next_cell[1];
+			NodeAddStart(&start, tmp);
 			//Board[next_cell[0]][next_cell[1]] = '0';
 			ChangeBoard(next_cell[0], next_cell[1], '0');
 			

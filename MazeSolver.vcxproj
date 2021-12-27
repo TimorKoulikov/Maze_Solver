@@ -141,9 +141,11 @@
   <ItemGroup>
     <ClCompile Include="MazeSolver.c" />
     <ClCompile Include="Node.c" />
+    <ClCompile Include="Vector.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

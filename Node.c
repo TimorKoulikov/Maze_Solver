@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include "Node.h"
-
+#include "Vector.h"
 /*Function create a single node and return it
 data must be lvalue*/
 Node* NodeCreate(void* data,DataType type) {
@@ -16,7 +16,7 @@ Node* NodeCreate(void* data,DataType type) {
 			effectivesize = sizeof(char);
 			break;
 		case(VECTOR):
-			effectivesize = sizeof(int);
+			effectivesize = sizeof(vec);
 			break;
 		default:
 			printf("NodeCreate() got wrong Type\n");

@@ -38,6 +38,8 @@ void deleteVector(vec* v)
 	free(v);
 }
 
+
+
 //print out the vector<x,y>
 void printVector(vec* v)
 {

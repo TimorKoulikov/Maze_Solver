@@ -31,7 +31,7 @@ void Solve(Node* start);
 //creating the path of the maze
 void CreateMaze();
 //find all nearby cells of a given cell in the maze
-int** nearbyCells(int*);
+vec** nearbyCells(int*);
 
 int main() 
 {
@@ -89,44 +89,48 @@ void InitMaze()
 	srand(getpid());//Create uniqe rand(). without it the rand will generate the same random sequnce.
 
 	//Create the Maze
-	int startpoint[2] = { START, 0 };
-	Node* start = NodeCreate(startpoint, VECTOR);
+	//int startpoint[2] = { START, 0 };
+	vec startpoint = { START,0 };
+	Node* start = NodeCreate(copyVector(&startpoint), VECTOR);
 
-	int** cells;
+	//int** cells;
+	vec* cells;
 	while (start != NULL) {//create Functions
 		
 
-		int** close_cells = nearbyCells(start->data);
-		int num_close_cells = close_cells[0][0];
+		//int** close_cells = nearbyCells(start->data);
+		vec** close_cells = nearbyCells(start->data);
+		int num_close_cells = close_cells[0]->x;
+
 		if (num_close_cells == 0) {
 			start = start->Next;
 			continue;
 		}
 
-		int r_cell = rand() % (num_close_cells );
+		int r_cell = rand() % (num_close_cells);
 		
-		int* next_cell = close_cells[r_cell + 1];
-		int* tmp = (int*)malloc(sizeof(int));
-		tmp[0] = next_cell[0];
-		tmp[1] = next_cell[1];
-		NodeAddStart(&start, tmp);
+		vec* next_cell = close_cells[r_cell + 1];
+		
+		NodeAddStart(&start, copyVector(next_cell));
 		//Board[next_cell[0]][next_cell[1]] = '0';
-		ChangeBoard(next_cell[0], next_cell[1], '0');
+		ChangeBoard(next_cell->x, next_cell->y, '0');
 
 		//wtf is this????   
-		if (abs(next_cell[0] - END) < 2 && abs(next_cell[1] - (width - 2)) < 2) {
-			if (abs(next_cell[0] - END) ^ abs(next_cell[1] - (width - 2))) {
-				int temp[2] = { END,width - 1 };
+		if (abs(next_cell->x - END) < 2 && abs(next_cell->y - (width - 2)) < 2) {
+			if (abs(next_cell->y - END) ^ abs(next_cell->y - (width - 2))) {
+				//int temp[2] = { END,width - 1 };
+				//next_cell = temp;
+				vec* temp = vector(END, width - 1);
 				next_cell = temp;
-				NodeAddStart(&start, next_cell);
+				NodeAddStart(&start, copyVector(temp));
 			}
 		}
 		//free memory allocation
-		for (int i = 0; i < num_close_cells; i++)
+		/*for (int i = 0; i < num_close_cells; i++)
 		{
 			free(close_cells[i]);
 		}
-		free(close_cells);
+		free(close_cells);*/
 	}
 
 
@@ -164,14 +168,14 @@ int CanGo(int x,int y) {
 		
 }
 //return array of nearby cells
-int** nearbyCells(int* cell) 
+vec** nearbyCells(vec* cell) 
 {
 	
 	int addVec[4][2] = { {-1,0},{1,0},{0,1},{0,-1} };
 	int sumVec[4][2];
 	int count = 0;
-	int x = cell[0];
-	int y = cell[1];
+	int x = cell->x;
+	int y = cell->y;
 
 	
 	
@@ -190,16 +194,12 @@ int** nearbyCells(int* cell)
 		
 	}
 
-	int** cells=(int**)calloc(count+1,sizeof(*cells));
-	for (int i = 0; i < count; i++)
-	{
-		cells[i+1] = (int*)malloc(2 * sizeof(int));
-		cells[i+1][0] = sumVec[i][0];
-		cells[i+1][1] = sumVec[i][1];
-	}
-	cells[0] = (int*)malloc(2 * sizeof(int));
-	cells[0][0] = count;
+	vec** cells=(vec**)malloc((count+1)*sizeof(vec*));
 
+	for (int i = 0; i < count; i++)
+		cells[i + 1] = vector(sumVec[i][0], sumVec[i][1]);
+	
+	cells[0] = vector(count, 0);
 	return cells;
 	
 	

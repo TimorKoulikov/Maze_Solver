@@ -4,9 +4,6 @@
 #include "Node.h"
 #include "Vector.h"
 
-//TO_DO//
-//check about memory allocatin and returning array and pointer from function
-
 
 #define START 5
 #define END 6
@@ -256,6 +253,12 @@ void Solve(Node * node) {
 			
 			ChangeBoard(nodeVector->x, nodeVector->y, '1');
 			
+			//free memory allocation
+			for (int i = 0; i < num_close_cells; i++)
+			{
+				free(close_cells[i]);
+			}
+			free(close_cells);
 			return 0;
 		}
 		for (int i = 0; i < num_close_cells ; i++) {

@@ -2,6 +2,7 @@
 #include <stddef.h>
 
 #define SIZE_OF_VECTOR 2
+
 typedef struct vec
 {
 	int x;

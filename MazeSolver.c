@@ -76,10 +76,6 @@ void InitBoard()
 	Board[START][0] = ' ';
 	Board[END][height - 1] = ' ';
 
-
-
-
-
 }
 
 
@@ -89,16 +85,13 @@ void InitMaze()
 	srand(getpid());//Create uniqe rand(). without it the rand will generate the same random sequnce.
 
 	//Create the Maze
-	//int startpoint[2] = { START, 0 };
-	vec startpoint = { START,0 };
-	Node* start = NodeCreate(copyVector(&startpoint), VECTOR);
+	
+	Node* start = NodeCreate(vector(START,0), VECTOR);
 
-	//int** cells;
+	
 	vec* cells;
-	while (start != NULL) {//create Functions
-		
-
-		//int** close_cells = nearbyCells(start->data);
+	while (start != NULL) {
+				
 		vec** close_cells = nearbyCells(start->data);
 		int num_close_cells = close_cells[0]->x;
 
@@ -112,25 +105,24 @@ void InitMaze()
 		vec* next_cell = close_cells[r_cell + 1];
 		
 		NodeAddStart(&start, copyVector(next_cell));
-		//Board[next_cell[0]][next_cell[1]] = '0';
+		
 		ChangeBoard(next_cell->x, next_cell->y, '0');
 
-		//wtf is this????   
+		
 		if (abs(next_cell->x - END) < 2 && abs(next_cell->y - (width - 2)) < 2) {
-			if (abs(next_cell->y - END) ^ abs(next_cell->y - (width - 2))) {
-				//int temp[2] = { END,width - 1 };
-				//next_cell = temp;
+			if (abs(next_cell->x - END) ^ abs(next_cell->y - (width - 2))) {
+				
 				vec* temp = vector(END, width - 1);
-				next_cell = temp;
+				
 				NodeAddStart(&start, copyVector(temp));
 			}
 		}
-		//free memory allocation
-		/*for (int i = 0; i < num_close_cells; i++)
+		
+		for (int i = 0; i < num_close_cells; i++)
 		{
 			free(close_cells[i]);
 		}
-		free(close_cells);*/
+		free(close_cells);
 	}
 
 
@@ -245,45 +237,38 @@ void ChangeBoard(int x, int y,char c){
 	Draw();
 }
 
-void Solve(Node * start) {
+void Solve(Node * node) {
 		
-		if (start == NULL) {
-			int startpoint[2] = { START, 0 };
-			start = NodeCreate(startpoint, VECTOR);
-		}
+		if (node == NULL) 			
+			node = NodeCreate(vector(START,0), VECTOR);
+		
 	
-		int start_point[2];
-		start_point[0] = ((int*)(start->data))[0];
-		start_point[1] = ((int*)(start->data))[1];
-		
-		if (start_point[0] == END && start_point[1] == height - 2) {
-			//Board[start_point[0]][start_point[1]] = '2';
-			ChangeBoard(start_point[0], start_point[1], '2');
+		vec* nodeVector=copyVector(node->data);
+			
+		if (nodeVector->x == END && nodeVector->y == height - 2) {
+			ChangeBoard(nodeVector->x, nodeVector->y, '2');
 			return 0;
 		}
 
-		int** close_cells = nearbyCells(start->data);
-		int num_close_cells = close_cells[0][0];
+		vec** close_cells = nearbyCells(node->data);
+		int num_close_cells = close_cells[0]->x;
 		if (num_close_cells == 0) {
-			//Board[start_point[0]][start_point[1]] = '1';
-			ChangeBoard(start_point[0], start_point[1], '1');
+			
+			ChangeBoard(nodeVector->x, nodeVector->y, '1');
 			
 			return 0;
 		}
 		for (int i = 0; i < num_close_cells ; i++) {
 
-			int* next_cell = close_cells[i + 1];
-			int* tmp = (int*)malloc(sizeof(int));
-			tmp[0] = next_cell[0];
-			tmp[1] = next_cell[1];
-			NodeAddStart(&start, tmp);
-			//Board[next_cell[0]][next_cell[1]] = '0';
-			ChangeBoard(next_cell[0], next_cell[1], '0');
+			vec* next_cell = close_cells[i + 1];		
+			NodeAddStart(&node, copyVector(next_cell));
 			
-			Solve(start);
-			if (Board[next_cell[0]][next_cell[1]] == '2') {
-				//Board[start_point[0]][start_point[1]] = '2';
-				ChangeBoard(start_point[0], start_point[1], '2');
+			ChangeBoard(next_cell->x, next_cell->y, '0');
+			
+			Solve(node);
+			if (Board[next_cell->x][next_cell->y] == '2') {
+				
+				ChangeBoard(nodeVector->x, nodeVector->y, '2');
 				return 0;
 			}
 
@@ -292,17 +277,7 @@ void Solve(Node * start) {
 
 		}
 
-		
-			//Board[start_point[0]][start_point[1]] = '1';
-		ChangeBoard(start_point[0], start_point[1], '1');
-			
-		
-		//printf("\033[32;1m %d %d\033[0m\n",r_cell,num_close_cells-1);
-		
-		
-		
-		
-	
+		ChangeBoard(nodeVector->x, nodeVector->y, '1');	
 
 }
 

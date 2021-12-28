@@ -86,7 +86,7 @@ void InitMaze()
 	Node* start = NodeCreate(vector(START,0), VECTOR);
 
 	
-	vec* cells;
+	
 	while (start != NULL) {
 				
 		vec** close_cells = nearbyCells(start->data);
